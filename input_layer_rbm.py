@@ -67,14 +67,19 @@ class RBM:
             # Note, again, that we're using the activation *probabilities* when computing associations, not the states
             # themselves.
 
-            neg_associations_i = np.zeros((num_examples, self.num_visible + 1, self.num_hidden + 1))
-
+            # Decomposing neg_associations as well
+	    neg_associations_i = np.zeros((num_examples, self.num_visible + 1, self.num_hidden + 1))
+	    	 
             for i in range(num_examples):
 
                 neg_associations_i[i, :, :] = np.outer(neg_visible_probs.T[:, i], neg_hidden_probs[i, :])
 
             delta_wi = np.zeros((num_examples, self.num_visible + 1, self.num_hidden + 1))
-
+            
+            # Instead of doing the update for all users at once
+	    # we do it for each one seperately and then fill with zeros the lines
+	    # of dw_i where the missing values correspond. In the end we sum all dw_i's 
+	    # to the dw for all users and update the weights
             for i in range(0, num_examples):
 
                 delta_wi[i, :, :] = pos_associations_i[i, :, :] - neg_associations_i[i, :, :]
